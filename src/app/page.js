@@ -41,13 +41,11 @@ async function getPros(filter){
 }
 
 export default function HomePage() {
-	const [category, setCategory] = useState("");
+	const [category, setCategory] = useState(""); 
 	const [subCategory, setSubCategory] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
 	const [pros, setPros] = useState([]);
-	const [field, set_field] = useQueryState("field", {defaultValue:""})
-	const [value, set_value] = useQueryState("value", {defaultValue:""})
 
 	useEffect(() => {
 		if (!category) return;
