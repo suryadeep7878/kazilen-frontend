@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import CategoryTabs from "./components/CategoryTabs";
 import SubCategoryTabs from "./components/SubCategoryTabs";
 import ProfessionalCard from "./components/ProfessionalCard";
+import { useQueryState } from "nuqs";
 
 const BASE_URL = "http://localhost:8000/api/filterworker"
 
@@ -45,6 +46,8 @@ export default function HomePage() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
 	const [pros, setPros] = useState([]);
+	const [field, set_field] = useQueryState("field", {defaultValue:""})
+	const [value, set_value] = useQueryState("value", {defaultValue:""})
 
 	useEffect(() => {
 		if (!category) return;
