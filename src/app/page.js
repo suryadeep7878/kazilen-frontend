@@ -17,13 +17,20 @@ const categories = {
 	"Home Cleaning": "home",
 };
 
+const subCat = {
+	'Book a Consultant': "consult",
+  'Book by Hour': "book",
+  'Fixed Service Charge': "fixed",
+}
+
+
 async function getPros(category, subcategory){
 	const searchParams = new URLSearchParams();
 	if (category){
 		searchParams.set("category", categories[category]);
 	}
 	if (subcategory){
-		searchParams.set("subcategory", subcategory);
+		searchParams.set("subcategory", subCat[subcategory]);
 	}
 	const finalURL = `${BASE_URL}?${searchParams.toString()}`;
 	try{
