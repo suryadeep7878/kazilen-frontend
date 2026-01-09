@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import CategoryTabs from "./components/CategoryTabs";
 import SubCategoryTabs from "./components/SubCategoryTabs";
 import ProfessionalCard from "./components/ProfessionalCard";
-import { useQueryState } from "nuqs";
 
 const BASE_URL = "http://localhost:8000/api/filterworker"
 
