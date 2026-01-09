@@ -51,7 +51,7 @@ export default function ProfessionalCard({ professional }) {
       {/* Card Layout */}
       <div className="flex items-start gap-4 border rounded-2xl p-4 shadow-sm hover:shadow-md transition-all bg-white mb-3">
         <Image
-          src={'/default-user.png'}
+          src={professional.imageURL}
           alt={professional.name}
           width={90}
           height={90}
@@ -184,7 +184,7 @@ export default function ProfessionalCard({ professional }) {
 
             <div className="flex flex-col items-center text-center">
               <Image
-                src={'/default-user.png'}
+                src={professional.imageURL}
                 alt={professional.name}
                 width={110}
                 height={110}

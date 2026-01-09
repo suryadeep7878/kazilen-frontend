@@ -4,7 +4,7 @@ import CategoryTabs from "./components/CategoryTabs";
 import SubCategoryTabs from "./components/SubCategoryTabs";
 import ProfessionalCard from "./components/ProfessionalCard";
 
-const BASE_URL = "http://localhost:8000/api/filterworker"
+const BASE_URL = "http://localhost:8000/bakend/api/filterworker"
 
 
 const categories = {
