@@ -18,7 +18,6 @@ export default function CreateAccountPage() {
 
   const [phoneNo, setPhone] = useState('')
 
-	const DJANGO_URL = 'http://localhost:8000/bakend/api'
 
   const canSubmit = Boolean(name.trim() && dob && gender && /^\d{10}$/.test(phoneNo))
 
@@ -41,19 +40,19 @@ export default function CreateAccountPage() {
 			////===========================================================
       const created = await apiRequest(endpoint="/create-account", method="POST", body=payload)
 			////===========================================================
-      if (created?.id) {
-        const idStr = String(created.id)
-        localStorage.setItem('kazilen_user_id', idStr)
-        localStorage.setItem('userId', idStr)            // <-- important canonical key
-      }
+      //if (created?.id) {
+      //  const idStr = String(created.id)
+      //  localStorage.setItem('kazilen_user_id', idStr)
+      //  localStorage.setItem('userId', idStr)            // <-- important canonical key
+      //}
 
-      if (created?.phoneNo) {
-        localStorage.setItem('kazilen_user_phoneNo', created.phone)
-        localStorage.setItem('kazilen_user_phoneNo_v2', created.phone)
-      } else if (phoneNo) {
-        localStorage.setItem('kazilen_user_phoneNo', phone)
-        localStorage.setItem('kazilen_user_phoneNo_v2', phone)
-      }
+      //if (created?.phoneNo) {
+      //  localStorage.setItem('kazilen_user_phoneNo', created.phoneNo)
+      //  localStorage.setItem('kazilen_user_phoneNo_v2', created.phoneNo)
+      //} else if (phoneNo) {
+      //  localStorage.setItem('kazilen_user_phoneNo', phoneNo)
+      //  localStorage.setItem('kazilen_user_phoneNo_v2', phoneNo)
+      //}
 
 
       alert('Account created successfully!')
