@@ -1,9 +1,9 @@
-// app/login/page.js
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { checkPhone } from '../lib/api' // adjust path if your file is elsewhere
+//import { checkPhone } from '../lib/api' // adjust path if your file is elsewhere
+import { apiRequest } from '../../utils/api'
 
 const LEGACY_USER_KEYS = ['userId', 'kazilen_user_id', 'kazilen_userId', 'kazilen_user_id_v2']
 
