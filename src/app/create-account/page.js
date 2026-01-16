@@ -37,11 +37,12 @@ export default function CreateAccountPage() {
       const genderEnum = gender ? gender.toUpperCase() : null
       
       const payload = {
-        phone: phoneNo, // Django field name 'phone'
-        name: name.trim(),
-        email: email || null,
-        dob,
-        gender: genderEnum,
+        "phoneNo": phoneNo, // Django field name 'phone'
+        "name": name.trim(),
+        "email": email || null,
+        "dob": dob,
+				"address": address,
+        "gender": genderEnum,
       }
 
       // 2. Call Django Backend
@@ -117,6 +118,7 @@ export default function CreateAccountPage() {
         </fieldset>
       </div>
 
+			
       {/* DOB */}
       <div className="px-4 mt-4">
         <fieldset className={`relative border rounded-lg px-3 pt-4 pb-2 ${touched.dob && !dob ? 'border-red-400' : 'border-gray-300'}`}>
