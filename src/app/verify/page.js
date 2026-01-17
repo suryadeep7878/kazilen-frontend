@@ -8,7 +8,7 @@ import { apiRequest } from '../../utils/api'
 export default function VerifyOtpPage() {
   const router = useRouter()
   const params = useSearchParams()
-	const {phone} = router.query
+	const phone = params.get('phone')
 
   const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', ''])
   const [seconds, setSeconds] = useState(30)
