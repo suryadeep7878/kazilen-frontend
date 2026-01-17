@@ -39,9 +39,8 @@ export default function CreateAccountPage() {
       const payload = {
         "phoneNo": phoneNo, // Django field name 'phone'
         "name": name.trim(),
-        "email": email || null,
+        "email": email,
         "dob": dob,
-				"address": address,
         "gender": genderEnum,
       }
 

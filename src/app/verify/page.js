@@ -8,7 +8,7 @@ import { apiRequest } from '../../utils/api'
 export default function VerifyOtpPage() {
   const router = useRouter()
   const params = useSearchParams()
-  const phone = params.get('phone') || '' // passed from login page
+	const {phone} = router.query
 
   const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', ''])
   const [seconds, setSeconds] = useState(30)
@@ -41,11 +41,15 @@ export default function VerifyOtpPage() {
     }
     try {
       setLoading(true)
-      const data = await verifyOtp(phone, fullOtp) // { token } or sets cookie
-      if (data?.token) {
-        localStorage.setItem('token', data.token) // optional if not using httpOnly cookie
-      }
-      router.push('/') // success
+      const response = await apiRequest("/verify-otp", "POST",{"phone":phone, "otp": fullOtp}) // { token } or sets cookie
+			if (response.ok){
+				const result = await apiRequest("/check", "POST", { phone })
+				if (result?.exists){
+					router.push('/')
+				}else{
+					router.push(`/create-account?phone=${encodeURIComponent(phone)}`)
+				}
+			}
     } catch (e) {
       alert(`OTP verification failed: ${e.message}`)
     } finally {
