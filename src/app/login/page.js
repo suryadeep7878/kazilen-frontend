@@ -33,7 +33,8 @@ export default function LoginPage() {
       //} else {
       //  router.push(`/create-account?phone=${encodeURIComponent(phone)}`)
       //}
-		const _ = await apiRequest("/send-otp", "POST", {phone})	
+		var fphone = `91${phone}`
+		const _ = await apiRequest("/send-otp", "POST", { "phone":fphone})	
 		router.push(`/verify?phone=${encodeURIComponent(phone)}`)
     } catch (e) {
       alert(`Failed to check phone: ${e?.message ?? e}`)

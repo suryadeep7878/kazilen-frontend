@@ -41,7 +41,7 @@ export default function VerifyOtpPage() {
     }
     try {
       setLoading(true)
-      const response = await apiRequest("/verify-otp", "POST",{"phone":phone, "otp": fullOtp}) // { token } or sets cookie
+      const response = await apiRequest("/verify-otp", "POST",{"phone":`91${phone}`, "otp": fullOtp}) // { token } or sets cookie
 			if (response.ok){
 				const result = await apiRequest("/check", "POST", { phone })
 				if (result?.exists){
