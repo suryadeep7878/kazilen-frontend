@@ -21,18 +21,6 @@ export default function LoginPage() {
     try {
       setLoading(true)
 
-			//const result = await apiRequest("/check", "POST", { phone })
-
-
-      //if (result?.exists) {
-        //if (result.userId) {
-        //  localStorage.setItem('kazilen_user_id', String(result.userId))
-        //  localStorage.setItem('userId', String(result.userId))
-        //}
-      //  router.push('/')
-      //} else {
-      //  router.push(`/create-account?phone=${encodeURIComponent(phone)}`)
-      //}
 		var fphone = `91${phone}`
 		const _ = await apiRequest("/send-otp", "POST", { "phone":fphone})	
 		router.push(`/verify?phone=${encodeURIComponent(phone)}`)

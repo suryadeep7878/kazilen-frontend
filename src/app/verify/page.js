@@ -3,6 +3,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useState, useEffect, useRef } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { apiRequest } from '../../utils/api'
+import { stringify } from 'querystring'
 
 
 export default function VerifyOtpPage() {
@@ -41,7 +42,9 @@ export default function VerifyOtpPage() {
     }
     try {
       setLoading(true)
-      const response = await apiRequest("/verify-otp", "POST",{"phone":`91${phone}`, "otp": fullOtp}) // { token } or sets cookie
+      const response = await apiRequest("/verify-otp", "POST",{"phone":`91${phone}`, "otp": fullOtp}); // { token } or sets cookie
+			localStorage.setItem("session_token", stringify(response.session));
+
 			if (response.ok){
 				const result = await apiRequest("/check", "POST", { phone })
 				if (result?.exists){
