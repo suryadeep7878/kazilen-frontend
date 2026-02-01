@@ -39,6 +39,7 @@ export default function HomePage() {
               price: 250,
             }}
           />
+          
         )}
       </section>
     </main>

@@ -10,14 +10,23 @@ export default function ProfessionalCard({ professional }) {
   const [showProfile, setShowProfile] = useState(false)
   const router = useRouter()
 
-  const handleBook = () => setShowConfirm(true)
+  const handleBook = () => {
+    if (showProfile) {
+      setShowProfile(false)
+      // allow profile close animation before opening confirm
+      setTimeout(() => setShowConfirm(true), 200)
+    } else {
+      setShowConfirm(true)
+    }
+  }
 
   const confirmBooking = () => {
     setShowConfirm(false)
-    router.push('/booking-status') // direct redirect
+    router.push('/booking-status')
   }
 
   const cancelBooking = () => setShowConfirm(false)
+
   const handleViewProfile = () => setShowProfile(true)
   const closeProfile = () => setShowProfile(false)
 
@@ -82,15 +91,14 @@ export default function ProfessionalCard({ professional }) {
 
       {/* Confirm Booking Modal */}
       {showConfirm && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-white rounded-2xl p-6 w-[90%] max-w-sm text-center">
             <h3 className="text-lg font-semibold text-gray-800">
               Confirm Booking
             </h3>
 
             <p className="text-sm text-gray-600 mt-2">
-              Book{' '}
-              <span className="font-medium">{professional.name}</span> for{' '}
+              Book <span className="font-medium">{professional.name}</span> for{' '}
               <span className="font-semibold text-pink-600">
                 ₹{professional.price || '250'}/hour
               </span>
@@ -115,55 +123,69 @@ export default function ProfessionalCard({ professional }) {
         </div>
       )}
 
-      {/* Profile Modal */}
-      {showProfile && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-          <div className="bg-white rounded-2xl w-[90%] max-w-md p-6 relative">
+      {/* Profile Bottom Sheet */}
+      <div
+        className={`fixed inset-0 z-40 transition-all duration-300 ${
+          showProfile ? 'visible' : 'invisible'
+        }`}
+      >
+        <div
+          onClick={closeProfile}
+          className={`absolute inset-0 bg-black/50 transition-opacity duration-300 ${
+            showProfile ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+
+        <div
+          className={`absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl p-6 max-w-md mx-auto
+          transform transition-transform duration-300 ${
+            showProfile ? 'translate-y-0' : 'translate-y-full'
+          }`}
+        >
+          <button
+            onClick={closeProfile}
+            className="absolute top-3 right-3 text-gray-500"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
+          <div className="flex flex-col items-center text-center">
+            <Image
+              src={professional.image || '/default-user.png'}
+              alt={professional.name}
+              width={110}
+              height={110}
+              className="rounded-full mb-3"
+            />
+            <h2 className="text-lg font-semibold">{professional.name}</h2>
+            <p className="text-sm text-gray-500">
+              {professional.skill || 'Service Provider'}
+            </p>
+          </div>
+
+          <div className="mt-4 text-sm text-gray-600 space-y-2">
+            <p>{professional.description}</p>
+            <p><b>Experience:</b> {professional.experience || '2+ years'}</p>
+            <p><b>Location:</b> {professional.location || 'Nearby'}</p>
+            <p><b>Price:</b> ₹{professional.price || '250'}/hour</p>
+          </div>
+
+          <div className="flex justify-center gap-3 mt-5">
             <button
               onClick={closeProfile}
-              className="absolute top-3 right-3 text-gray-500"
+              className="px-4 py-2 rounded-lg bg-gray-200"
             >
-              <X className="w-5 h-5" />
+              Close
             </button>
-
-            <div className="flex flex-col items-center text-center">
-              <Image
-                src={professional.image || '/default-user.png'}
-                alt={professional.name}
-                width={110}
-                height={110}
-                className="rounded-full mb-3"
-              />
-              <h2 className="text-lg font-semibold">{professional.name}</h2>
-              <p className="text-sm text-gray-500">
-                {professional.skill || 'Service Provider'}
-              </p>
-            </div>
-
-            <div className="mt-4 text-sm text-gray-600 space-y-2">
-              <p>{professional.description}</p>
-              <p><b>Experience:</b> {professional.experience || '2+ years'}</p>
-              <p><b>Location:</b> {professional.location || 'Nearby'}</p>
-              <p><b>Price:</b> ₹{professional.price || '250'}/hour</p>
-            </div>
-
-            <div className="flex justify-center gap-3 mt-5">
-              <button
-                onClick={closeProfile}
-                className="px-4 py-2 rounded-lg bg-gray-200"
-              >
-                Close
-              </button>
-              <button
-                onClick={handleBook}
-                className="px-4 py-2 rounded-lg bg-pink-500 text-white"
-              >
-                Book Now
-              </button>
-            </div>
+            <button
+              onClick={handleBook}
+              className="px-4 py-2 rounded-lg bg-pink-500 text-white"
+            >
+              Book Now
+            </button>
           </div>
         </div>
-      )}
+      </div>
     </div>
   )
 }
