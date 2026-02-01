@@ -1,15 +1,15 @@
+// app/create-account/page.js
 'use client'
+
 import { useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createUser } from '@/app/lib/api'
 
-import { apiRequest } from '../../utils/api'
-
 export default function CreateAccountPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const phoneNoFromQuery = searchParams?.get('phone') || ''
+  const phoneFromQuery = searchParams?.get('phone') || ''
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')          // optional
@@ -17,42 +17,45 @@ export default function CreateAccountPage() {
   const [gender, setGender] = useState('')        // required: Male/Female/Other
   const [touched, setTouched] = useState({})      // for showing inline errors
 
-  const [phoneNo, setPhone] = useState('')
+  // Keep phone as readonly state (optional: allow editing by using setPhone)
+  const [phone, setPhone] = useState('')
 
-
-  const canSubmit = Boolean(name.trim() && dob && gender && /^\d{10}$/.test(phoneNo))
+	const DJANGO_URL = 'http://localhost:8000/api'
+  // Required fields: name, dob, gender
+  const canSubmit = Boolean(name.trim() && dob && gender && /^\d{10}$/.test(phone))
 
   const handleCreateAccount = async () => {
+    // Client-side validation
     if (!canSubmit) {
       setTouched({ name: true, dob: true, gender: true })
-      alert('Please fill Name, Date of Birth, Gender and ensure phoneNo is present.')
+      alert('Please fill Name, Date of Birth, Gender and ensure phone is present.')
       return
     }
 
     try {
       const genderEnum = gender ? gender.toUpperCase() : null // MALE/FEMALE/OTHER
       const payload = {
-        phoneNo,                 // IMPORTANT: include phone from query
+        phone,                 // IMPORTANT: include phone from query
         name: name.trim(),
         email: email || null,  // email optional
         dob,                   // required
         gender: genderEnum,    // required
       }
-			////===========================================================
-      const created = await apiRequest(endpoint="/create-account", method="POST", body=payload)
-			////===========================================================
+
+      const created = await createUser(payload)
+
       if (created?.id) {
         const idStr = String(created.id)
         localStorage.setItem('kazilen_user_id', idStr)
         localStorage.setItem('userId', idStr)            // <-- important canonical key
       }
 
-      if (created?.phoneNo) {
-        localStorage.setItem('kazilen_user_phoneNo', created.phoneNo)
-        localStorage.setItem('kazilen_user_phoneNo_v2', created.phoneNo)
-      } else if (phoneNo) {
-        localStorage.setItem('kazilen_user_phoneNo', phoneNo)
-        localStorage.setItem('kazilen_user_phoneNo_v2', phoneNo)
+      if (created?.phone) {
+        localStorage.setItem('kazilen_user_phone', created.phone)
+        localStorage.setItem('kazilen_user_phone_v2', created.phone)
+      } else if (phone) {
+        localStorage.setItem('kazilen_user_phone', phone)
+        localStorage.setItem('kazilen_user_phone_v2', phone)
       }
 
 
@@ -81,13 +84,13 @@ export default function CreateAccountPage() {
           <legend className="text-xs px-1 text-gray-500">Phone</legend>
           <input
             type="tel"
-            value={phoneNo}
+            value={phone}
             readOnly
             className="w-full border-none bg-transparent p-0 text-sm text-gray-800 focus:outline-none"
           />
         </fieldset>
-        {!/^\d{10}$/.test(phoneNo) && (
-          <p className="text-xs text-red-500 mt-1">Phone not found or invalid. Go back to login and enter a valid phoneNo.</p>
+        {!/^\d{10}$/.test(phone) && (
+          <p className="text-xs text-red-500 mt-1">Phone not found or invalid. Go back to login and enter a valid phone.</p>
         )}
       </div>
 

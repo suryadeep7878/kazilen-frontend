@@ -3,13 +3,37 @@ import { useEffect, useState } from "react";
 import CategoryTabs from "./components/CategoryTabs";
 import SubCategoryTabs from "./components/SubCategoryTabs";
 import ProfessionalCard from "./components/ProfessionalCard";
-import { throws } from "assert";
 
-const API_URL = "http://localhost:8000/api/workers"
+const BASE_URL = "http://localhost:8000/bakend/api/filterworker"
 
-async function getPros(){
+
+const categories = {
+	"Vehicle repair": "vehicle",
+	"Healthcare": "health",
+	"Carpenter": "carpenter",
+	"Electrician": "electrician",
+	"Appliance repair": "appliance",
+	"Home Cleaning": "home",
+};
+
+const subCat = {
+	'Book a Consultant': "consult",
+  'Book by Hour': "book",
+  'Fixed Service Charge': "fixed",
+}
+
+
+async function getPros(category, subcategory){
+	const searchParams = new URLSearchParams();
+	if (category){
+		searchParams.set("category", categories[category]);
+	}
+	if (subcategory){
+		searchParams.set("subcategory", subCat[subcategory]);
+	}
+	const finalURL = `${BASE_URL}?${searchParams.toString()}`;
 	try{
-		const response = await fetch(API_URL, {});
+		const response = await fetch(finalURL, {});
 		if (!response.ok){
 			throw new Error(`failed to fetch ${response.status} ${response.statusText}`);
 		}
@@ -21,7 +45,7 @@ async function getPros(){
 }
 
 export default function HomePage() {
-	const [category, setCategory] = useState("");
+	const [category, setCategory] = useState(""); 
 	const [subCategory, setSubCategory] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
@@ -33,7 +57,7 @@ export default function HomePage() {
 			setLoading(true);
 			setError("");
 			try {
-				const data = await getPros();
+				const data = await getPros(category, subCategory);
 				setPros(data);
 			} catch (e) {
 				setError(e.message || "Failed to load data");

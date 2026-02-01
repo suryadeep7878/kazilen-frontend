@@ -1,9 +1,10 @@
 'use client'
-
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState, useEffect, useRef } from 'react'
 import { ArrowLeft } from 'lucide-react'
-import { verifyOtp, resendOtp } from '../lib/api' // adjust path if needed
+import { apiRequest } from '../../utils/api'
+
+//import { verifyOtp, resendOtp } from '../lib/api' // adjust path if needed
 
 export default function VerifyOtpPage() {
   const router = useRouter()

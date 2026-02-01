@@ -5,8 +5,8 @@ const nextConfig = {
       {
         protocol: 'http',
         hostname: 'localhost',
-        port: '5000',
-        pathname: 'D:\Kazilen-data',
+        port: '8888',
+        pathname: '/**',
       },
     ],
   },
