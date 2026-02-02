@@ -10,6 +10,16 @@ export default function ProfessionalCard({ professional }) {
   const [showProfile, setShowProfile] = useState(false)
   const router = useRouter()
 
+  // Normalize data fields to handle potential inconsistencies
+  const displayImage = professional.image || professional.imageURL || '/default-user.png'
+  const displayRole = professional.jobProfile || professional.skill || 'Service Provider'
+  const displayRating = professional.rating || '4.5'
+  const displayDescription = professional.description || professional.discription || 'Experienced and reliable professional offering top-quality service.'
+  const displayPrice = professional.price || '250'
+  const displayReviews = professional.reviews || '120'
+  const displayExperience = professional.experience || '2+ years'
+  const displayLocation = professional.location || 'Nearby'
+
   const handleBook = () => {
     if (showProfile) {
       setShowProfile(false)
@@ -35,7 +45,7 @@ export default function ProfessionalCard({ professional }) {
       {/* Card */}
       <div className="flex items-start gap-4 border rounded-2xl p-4 shadow-sm hover:shadow-md transition-all bg-white mb-3">
         <Image
-          src={professional.image || '/default-user.png'}
+          src={displayImage}
           alt={professional.name}
           width={90}
           height={90}
@@ -49,21 +59,20 @@ export default function ProfessionalCard({ professional }) {
                 {professional.name}
               </h3>
               <p className="text-sm text-gray-500">
-                {professional.skill || 'Service Provider'}
+                {displayRole}
               </p>
             </div>
 
             <div className="flex items-center bg-yellow-50 px-2 py-1 rounded-md">
               <Star className="w-4 h-4 text-yellow-500 fill-yellow-400" />
               <span className="ml-1 text-sm font-medium text-gray-700">
-                {professional.rating || '4.5'}
+                {displayRating}
               </span>
             </div>
           </div>
 
           <p className="text-sm text-gray-600 mt-2 line-clamp-2">
-            {professional.description ||
-              'Experienced and reliable professional offering top-quality service.'}
+            {displayDescription}
           </p>
 
           <div className="flex justify-between items-start mt-3 gap-2">
@@ -76,7 +85,7 @@ export default function ProfessionalCard({ professional }) {
 
             <div className="text-right">
               <p className="text-sm font-semibold text-pink-600">
-                ₹{professional.price || '250'} / hour
+                ₹{displayPrice} / hour
               </p>
               <button
                 onClick={handleBook}
@@ -100,7 +109,7 @@ export default function ProfessionalCard({ professional }) {
             <p className="text-sm text-gray-600 mt-2">
               Book <span className="font-medium">{professional.name}</span> for{' '}
               <span className="font-semibold text-pink-600">
-                ₹{professional.price || '250'}/hour
+                ₹{displayPrice}/hour
               </span>
               ?
             </p>
@@ -149,26 +158,49 @@ export default function ProfessionalCard({ professional }) {
             <X className="w-5 h-5" />
           </button>
 
-          <div className="flex flex-col items-center text-center">
-            <Image
-              src={professional.image || '/default-user.png'}
-              alt={professional.name}
-              width={110}
-              height={110}
-              className="rounded-full mb-3"
-            />
-            <h2 className="text-lg font-semibold">{professional.name}</h2>
-            <p className="text-sm text-gray-500">
-              {professional.skill || 'Service Provider'}
-            </p>
-          </div>
+            <div className="flex flex-col items-center text-center">
+              <Image
+                src={displayImage}
+                alt={professional.name}
+                width={110}
+                height={110}
+                className="rounded-full object-cover mb-3"
+              />
+              <h2 className="text-lg font-semibold text-gray-800">
+                {professional.name}
+              </h2>
+              <p className="text-sm text-gray-500">
+                {displayRole}
+              </p>
 
-          <div className="mt-4 text-sm text-gray-600 space-y-2">
-            <p>{professional.description}</p>
-            <p><b>Experience:</b> {professional.experience || '2+ years'}</p>
-            <p><b>Location:</b> {professional.location || 'Nearby'}</p>
-            <p><b>Price:</b> ₹{professional.price || '250'}/hour</p>
-          </div>
+              <div className="flex items-center justify-center mt-2">
+                <Star className="w-4 h-4 text-yellow-500 fill-yellow-400" />
+                <span className="ml-1 text-sm text-gray-700">
+                  {displayRating}
+                </span>
+                <span className="ml-2 text-xs text-gray-400">
+                  ({displayReviews} reviews)
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-4 border-t pt-4 text-sm text-gray-600 space-y-2">
+              <p>
+                {displayDescription}
+              </p>
+              <p>
+                <span className="font-medium text-gray-800">Experience:</span>{' '}
+                {displayExperience}
+              </p>
+              <p>
+                <span className="font-medium text-gray-800">Location:</span>{' '}
+                {displayLocation}
+              </p>
+              <p>
+                <span className="font-medium text-gray-800">Price:</span>{' '}
+                ₹{displayPrice}/hour
+              </p>
+            </div>
 
           <div className="flex justify-center gap-3 mt-5">
             <button
