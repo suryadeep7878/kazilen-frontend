@@ -58,9 +58,11 @@ export default function BookingStatusPage() {
           </div>
         </div>
 
-        {/* PIN */}
+        {/* START SERVICE PIN */}
         <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <p className="text-sm text-gray-500 mb-3">Start service with PIN</p>
+          <p className="text-sm text-gray-500 mb-3">
+            Start service with PIN
+          </p>
           <div className="flex gap-3">
             {[7, 7, 1, 1].map((n, i) => (
               <div
@@ -123,7 +125,29 @@ export default function BookingStatusPage() {
           </p>
         </div>
 
-        {/* TRIP DETAILS */}
+        {/* END SERVICE PIN (NO BUTTON) */}
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-amber-200">
+          <p className="text-sm text-amber-700 font-medium mb-2">
+            End service with PIN
+          </p>
+
+          <p className="text-xs text-gray-500 mb-3">
+            Ask the professional for the PIN to safely complete the service
+          </p>
+
+          <div className="flex gap-3">
+            {[3, 9, 4, 2].map((n, i) => (
+              <div
+                key={i}
+                className="flex-1 h-12 flex items-center justify-center text-xl font-bold rounded-xl border bg-amber-50"
+              >
+                {n}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* PAYMENT SUMMARY */}
         <div className="bg-white rounded-2xl p-5 shadow-sm space-y-4">
           <h3 className="text-base font-semibold text-gray-800">
             Payment Summary
