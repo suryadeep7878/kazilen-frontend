@@ -5,6 +5,7 @@ import ConditionalBottomNav from "./components/ConditionalBottomNav";
 export const metadata = {
 	title: "Kazilen",
 	description: "Rom writing ya disc",
+	manifest:"/manifest.json"
 };
 
 export default function RootLayout({ children }) {
