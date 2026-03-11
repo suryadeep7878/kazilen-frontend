@@ -2,6 +2,7 @@ import "./globals.css";
 import ConditionalHeader from "./components/ConditionalHeader";
 import ConditionalBottomNav from "./components/ConditionalBottomNav";
 import ServiceWorkerRegister from "./ServiceWorkerRegister";
+import LocationLoader from "./components/LocationLoader"
 
 export const metadata = {
   title: "Kazilen",
@@ -15,6 +16,7 @@ export default function RootLayout({ children }) {
       <body>
         <ServiceWorkerRegister />
         <ConditionalHeader />
+        <LocationLoader />
         {children}
         <ConditionalBottomNav />
       </body>
