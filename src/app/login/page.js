@@ -29,9 +29,9 @@ export default function LoginPage() {
 
       const fphone = `91${phone}`
 
-      await apiRequest("/send-otp", "POST", { phone: fphone })
+      await apiRequest("/customer/send-otp", "POST", { phone: fphone })
 
-      router.push(`/verify?phone=${encodeURIComponent(phone)}`)
+      router.push(`/customer/verify?phone=${encodeURIComponent(phone)}`)
     } catch (e) {
       alert(`Failed to check phone: ${e?.message ?? e}`)
     } finally {
