@@ -57,7 +57,6 @@ export default function HomePage() {
 				<div className="space-y-4">
 					{workers.map((worker) => (
 						<ProfessionalCard key={worker.id} professional={worker} />
-						{console.log(worker)}
 					))}
 				</div>
 			</section>
