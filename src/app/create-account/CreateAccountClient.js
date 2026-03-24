@@ -9,7 +9,7 @@ export default function CreateAccountClient() {
 	const router = useRouter();
 	const Params = useSearchParams();
 	const phone = Params.get("phone");
-	const [phoneNo, setPhone] = useState("");
+	const [phoneNo, setPhone] = useState("${phone}");
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [dob, setDob] = useState("");
