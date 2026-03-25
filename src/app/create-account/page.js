@@ -9,7 +9,7 @@ export default function Page() {
 	const phone = param.get("phone")
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <CreateAccountClient phone={phone}/>
+      <CreateAccountClient phoneFromQuery={phone}/>
     </Suspense>
   );
 }
