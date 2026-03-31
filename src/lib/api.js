@@ -39,7 +39,7 @@ async function fetchWithJSON(url, options = {}) {
  */
 export async function fetchServices(filters = {}) {
   const params = new URLSearchParams();
-  
+
   if (filters.category) params.append("category", filters.category);
   if (filters.subCategory) params.append("subCategory", filters.subCategory);
   if (filters.sort) params.append("sort", filters.sort);
