@@ -35,6 +35,8 @@ export default function CreateAccountClient({ phoneFromQuery }) {
 				other: "O",
 			};
 
+			console.log(`phone is ${phoneNo} and actual is ${phoneFromQuery}`)
+
 			const genderEnum = genderMap[gender.toLowerCase()] || "O";
 
 			const payload = {
