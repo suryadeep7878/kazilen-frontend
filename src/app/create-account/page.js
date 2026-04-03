@@ -9,8 +9,6 @@ export default function Page() {
 	const param = useSearchParams();
 	const phone = param.get("phone");
 	return (
-		<Suspense fallback={<div>Loading...</div>}>
 			<CreateAccountClient phoneFromQuery={phone} />
-		</Suspense>
 	);
 }
