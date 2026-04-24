@@ -1,63 +1,116 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import CategoryTabs from "./components/CategoryTabs";
 import SubCategoryTabs from "./components/SubCategoryTabs";
 import ProfessionalCard from "./components/ProfessionalCard";
-import { apiRequest } from "@/utils/api";
+import ServiceCardSkeleton from "./components/skeletons/ServiceCardSkeleton";
+import ErrorState from "./components/ui/ErrorState";
+import EmptyState from "./components/ui/EmptyState";
+import { fetchWorkersByCategory } from "@/lib/api";
+import { Search } from "lucide-react";
 
 export default function HomePage() {
   const [category, setCategory] = useState("");
   const [subCategory, setSubCategory] = useState("");
 
-  const [workers, setWorkers] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const {
+    data: workers = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["workers", subCategory],
+    queryFn: () => fetchWorkersByCategory(subCategory),
+    enabled: !!subCategory,
+  });
 
-  useEffect(() => {
-    async function fetchWorkers() {
-      if (!subCategory) {
-        setWorkers([]);
-        return;
-      }
+  const handleCategoryChange = (val) => {
+    setCategory(val);
+    setSubCategory("");
+  };
 
-      setIsLoading(true);
-      try {
-        const response = await apiRequest(`/filterworker?category=${subCategory}`);
-        setWorkers(response);
-      } catch (error) {
-        console.error("Failed to fetch workers:", error);
-      } finally {
-        setIsLoading(false);
-      }
+  const renderContent = () => {
+    if (!category) {
+      return (
+        <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+          <Search className="w-12 h-12 mb-4 opacity-20" />
+          <p className="text-sm font-medium">Select a category to get started</p>
+        </div>
+      );
     }
 
-    fetchWorkers();
-  }, [subCategory]);
+    if (category && !subCategory) {
+      return (
+        <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+          <p className="text-sm font-medium">Please select a sub-category</p>
+        </div>
+      );
+    }
+
+    if (isLoading) {
+      return (
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <ServiceCardSkeleton key={i} />
+          ))}
+        </div>
+      );
+    }
+
+    if (isError) {
+      return (
+        <ErrorState
+          title="Couldn't load professionals"
+          message={error?.message || "Something went wrong while fetching data."}
+          onRetry={() => refetch()}
+        />
+      );
+    }
+
+    if (workers.length === 0) {
+      return (
+        <EmptyState
+          title="No professionals found"
+          message={`We couldn't find any professionals for ${subCategory} in your area.`}
+        />
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        {workers.map((worker) => (
+          <ProfessionalCard 
+            key={worker.id} 
+            professional={worker} 
+            subCategory={subCategory} 
+          />
+        ))}
+      </div>
+    );
+  };
 
   return (
     <main className="min-h-screen bg-gray-50 pb-20">
-      {/* Category */}
-      <CategoryTabs
-        value={category}
-        onChange={(val) => {
-          setCategory(val);
-          setSubCategory("");
-        }}
-      />
+      {/* Category Selection */}
+      <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b">
+        <CategoryTabs
+          value={category}
+          onChange={handleCategoryChange}
+        />
+        
+        {/* Sub Category Selection */}
+        {category && (
+          <div className="border-t">
+            <SubCategoryTabs value={subCategory} onChange={setSubCategory} />
+          </div>
+        )}
+      </div>
 
-      {/* Sub Category */}
-      {category && (
-        <SubCategoryTabs value={subCategory} onChange={setSubCategory} />
-      )}
-
-      {/* Placeholder UI (pure frontend) */}
-      <section className="px-4 mt-6 text-center text-gray-500">
-        {category && !subCategory && "Select a sub-category"}
-        <div className="space-y-4">
-          {workers.map((worker) => (
-            <ProfessionalCard key={worker.id} professional={worker} />
-          ))}
-        </div>
+      <section className="px-4 mt-6">
+        {renderContent()}
       </section>
     </main>
   );

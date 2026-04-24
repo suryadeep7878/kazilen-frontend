@@ -1,54 +1,116 @@
 "use client"
 
 import Image from "next/image"
+import { useEffect, useState } from "react"
+import { useQuery } from "@tanstack/react-query"
 import BackHeader from "./components/BackHeader"
+import { apiRequest } from "@/utils/api"
+import { useWorkerSocket } from "@/hooks/useWorkerSocket"
+import { generateStartPin } from "@/lib/bookingApi"
+import Skeleton from "@/app/components/ui/Skeleton"
+import ErrorState from "@/app/components/ui/ErrorState"
+import EmptyState from "@/app/components/ui/EmptyState"
+import { Calendar } from "lucide-react"
 
 export default function BookingStatusPage() {
-  const booking = {
-    title: "Electrician arriving in",
-    eta: "15 min",
-    subtitle: "298 m away • On the way",
-    avatar: "/images/provider-thumb.jpg"
+  const [startPin, setStartPin] = useState(["-", "-", "-", "-"])
+  
+  // 1. Fetch current active booking
+  const { data: bookingData, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ["current-booking"],
+    queryFn: () => apiRequest("/current-booking"),
+    refetchInterval: 10000, // Poll every 10s as backup
+  })
+
+  // 2. Listen for real-time updates from WebSocket
+  const { lastUpdate, isConnected } = useWorkerSocket()
+
+  // 3. Handle Pin generation logic
+  useEffect(() => {
+    if (bookingData && !bookingData.is_finished && bookingData.customer?.phoneNo && bookingData.worker?.phoneNo) {
+      generateStartPin(bookingData.customer.phoneNo, bookingData.worker.phoneNo)
+        .then(res => {
+          if (res?.startPin) {
+            setStartPin(res.startPin.toString().split(""))
+          }
+        })
+        .catch(err => console.error("Pin generation failed:", err))
+    }
+  }, [bookingData])
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-gray-50 pb-8">
+        <BackHeader />
+        <div className="max-w-xl mx-auto px-4 space-y-6">
+          <Skeleton className="h-32 w-full rounded-2xl" />
+          <Skeleton className="h-24 w-full rounded-2xl" />
+          <Skeleton className="h-32 w-full rounded-2xl" />
+        </div>
+      </main>
+    )
   }
 
-  const worker = {
-    role: "ELECTRICIAN",
-    name: "Vinod Kumar Manjhi",
-    avatar: "/images/worker-thumb.jpg",
-    rating: 4.7
+  if (isError) {
+    return (
+      <main className="min-h-screen bg-white">
+        <BackHeader />
+        <div className="px-4 py-10">
+          <ErrorState 
+            title="Failed to load booking" 
+            message={error?.message || "We couldn't retrieve your current booking status."}
+            onRetry={() => refetch()} 
+          />
+        </div>
+      </main>
+    )
   }
 
-  const pickup = {
-    label: "Service Address",
-    address:
-      "1885, New Shastri Nagar, Shastri Nagar, Jabalpur, Madhya Pradesh 482003"
+  if (!bookingData) {
+    return (
+      <main className="min-h-screen bg-white">
+        <BackHeader />
+        <div className="px-4 py-10">
+          <EmptyState 
+            title="No active booking" 
+            message="You don't have any bookings currently in progress."
+            icon={Calendar}
+          />
+        </div>
+      </main>
+    )
   }
 
-  const trip = {
-    photo: "/images/trip-photo.jpg",
-    caption: "Service location snapshot",
-    fare: 34,
-    paymentMethod: "GPay"
+  const worker = bookingData.worker || {
+    name: "Finding worker...",
+    categories: "Professional",
+    rating: "4.5",
+    imageURL: "/images/worker-thumb.jpg"
   }
 
+  const statusTitle = lastUpdate?.status === "arrived" ? "Professional Arrived" : "Professional on the way"
+  
   return (
-    <main className="min-h-screen bg-gray-100">
+    <main className="min-h-screen bg-gray-100 pb-8">
       <BackHeader />
 
-      <div className="max-w-xl mx-auto px-4 pb-8 space-y-6">
+      <div className="max-w-xl mx-auto px-4 space-y-6">
 
         {/* STATUS CARD */}
         <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-2xl p-5 shadow-md">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm opacity-90">{booking.title}</p>
-              <p className="text-3xl font-bold mt-1">{booking.eta}</p>
-              <p className="text-sm opacity-90 mt-1">{booking.subtitle}</p>
+              <p className="text-sm opacity-90">{statusTitle}</p>
+              <p className="text-3xl font-bold mt-1">{lastUpdate?.eta || "Calculating..."}</p>
+              <p className="text-sm opacity-90 mt-1">
+                {lastUpdate?.location ? `${lastUpdate.location} • ` : ""}
+                {isConnected ? "Live Connection" : "Reconnecting..."}
+              </p>
             </div>
 
-            <div className="w-14 h-14 rounded-xl overflow-hidden border border-white/30">
+            <div className="w-14 h-14 rounded-xl overflow-hidden border border-white/30 bg-emerald-400/20">
               <Image
-                src={booking.avatar}
+                src={worker.imageURL || "/images/provider-thumb.jpg"}
                 alt="provider"
                 width={56}
                 height={56}
@@ -59,28 +121,33 @@ export default function BookingStatusPage() {
         </div>
 
         {/* START SERVICE PIN */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <p className="text-sm text-gray-500 mb-3">
-            Start service with PIN
-          </p>
-          <div className="flex gap-3">
-            {[7, 7, 1, 1].map((n, i) => (
-              <div
-                key={i}
-                className="flex-1 h-12 flex items-center justify-center text-xl font-bold rounded-xl border bg-gray-50"
-              >
-                {n}
-              </div>
-            ))}
-          </div>
-        </div>
+        {!bookingData.is_started && (
+           <div className="bg-white rounded-2xl p-4 shadow-sm border border-emerald-100">
+           <p className="text-xs font-semibold text-emerald-600 mb-3 uppercase tracking-wider">
+             Start Service PIN
+           </p>
+           <p className="text-sm text-gray-500 mb-4">
+             Share this PIN with the professional when they arrive.
+           </p>
+           <div className="flex gap-3">
+             {startPin.map((n, i) => (
+                <div
+                  key={i}
+                  className="flex-1 h-14 flex items-center justify-center text-2xl font-bold rounded-xl border bg-gray-50 text-gray-800"
+                >
+                  {n}
+                </div>
+             ))}
+           </div>
+         </div>
+        )}
 
         {/* WORKER CARD */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full overflow-hidden border">
+            <div className="w-16 h-16 rounded-full overflow-hidden border bg-gray-50">
               <Image
-                src={worker.avatar}
+                src={worker.imageURL || "/images/worker-thumb.jpg"}
                 alt={worker.name}
                 width={64}
                 height={64}
@@ -89,95 +156,62 @@ export default function BookingStatusPage() {
             </div>
 
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-emerald-600 tracking-wide">
-                {worker.role}
+              <p className="text-xs font-semibold text-emerald-600 tracking-wide uppercase">
+                {worker.categories || "Professional"}
               </p>
               <p className="text-base font-semibold text-gray-800 truncate">
                 {worker.name}
               </p>
 
-              <div className="flex items-center gap-1 mt-1 text-sm">
-                <span className="font-semibold">{worker.rating}</span>
+              <div className="flex items-center gap-1 mt-1 text-sm bg-yellow-50 w-fit px-2 py-0.5 rounded-md">
+                <span className="font-bold text-yellow-700">{worker.rating || "4.5"}</span>
                 <svg
-                  className="w-4 h-4 text-yellow-400"
+                  className="w-4 h-4 text-yellow-400 fill-current"
                   viewBox="0 0 24 24"
-                  fill="currentColor"
                 >
                   <path d="M12 17.3 7.2 20l1.1-5.3L4 12.2l5.4-.5L12 7l2.6 4.7 5.4.5-4.3 2.5L16.8 20z" />
                 </svg>
               </div>
             </div>
 
-            <Image
-              src="/images/motorbike.png"
-              alt="vehicle"
-              width={28}
-              height={28}
-            />
+            <div className="p-3 bg-gray-50 rounded-2xl">
+              <Image
+                src="/images/motorbike.png"
+                alt="vehicle"
+                width={28}
+                height={28}
+              />
+            </div>
           </div>
         </div>
 
         {/* ADDRESS */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm">
-          <p className="text-sm text-gray-500">{pickup.label}</p>
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Service Address</p>
           <p className="text-base font-semibold text-gray-800 mt-1 leading-snug">
-            {pickup.address}
+             {bookingData.customer?.address || "Fetching address..."}
           </p>
-        </div>
-
-        {/* END SERVICE PIN (NO BUTTON) */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-amber-200">
-          <p className="text-sm text-amber-700 font-medium mb-2">
-            End service with PIN
-          </p>
-
-          <p className="text-xs text-gray-500 mb-3">
-            Ask the professional for the PIN to safely complete the service
-          </p>
-
-          <div className="flex gap-3">
-            {[3, 9, 4, 2].map((n, i) => (
-              <div
-                key={i}
-                className="flex-1 h-12 flex items-center justify-center text-xl font-bold rounded-xl border bg-amber-50"
-              >
-                {n}
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* PAYMENT SUMMARY */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm space-y-4">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-4">
           <h3 className="text-base font-semibold text-gray-800">
-            Payment Summary
+            Booking Summary
           </h3>
 
           <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Total Fare</span>
+            <span className="text-gray-500">Service</span>
             <span className="font-semibold text-gray-800">
-              ₹{trip.fare}
+              {bookingData.worker?.categories || "Professional Service"}
             </span>
           </div>
 
           <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Payment Method</span>
-            <span className="text-gray-800">{trip.paymentMethod}</span>
+            <span className="text-gray-500">Booking ID</span>
+            <span className="font-mono text-gray-400">#{bookingData.id?.split("-")[0] || "12345"}</span>
           </div>
 
-          <div className="rounded-xl overflow-hidden border bg-gray-100">
-            <Image
-              src={trip.photo}
-              alt={trip.caption}
-              width={900}
-              height={600}
-              className="object-cover w-full"
-            />
-          </div>
-
-          <p className="text-sm text-gray-600">{trip.caption}</p>
-
-          <button className="w-full mt-2 px-4 py-3 rounded-full border border-red-300 text-red-700 hover:bg-red-50 transition">
+          <button className="w-full mt-2 px-4 py-3 rounded-xl border border-red-100 text-red-600 font-semibold hover:bg-red-50 transition-colors">
             Cancel Service
           </button>
         </div>

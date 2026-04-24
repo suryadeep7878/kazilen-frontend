@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiRequest } from "../../utils/api";
+import SafeStorage, { setStoredPhone, getStoredPhone, validatePhone } from "../../utils/storage";
 import TermsOfCondition from "./TermsOfCondition";
 
 export default function LoginPage() {
@@ -26,11 +27,26 @@ export default function LoginPage() {
 		try {
 			setLoading(true);
 
-			const fphone = `91${phone}`;
+			// Persist phone and clear legacy data if user changed
+			const currentStored = getStoredPhone();
+			const normalizedInput = `91${phone}`;
+
+			if (currentStored && currentStored !== normalizedInput) {
+				const legacyKeys = ["session_token", "userId", "kazilen_user_id", "kazilen_userId", "kazilen_user_id_v2"];
+				legacyKeys.forEach(key => SafeStorage.remove(key));
+			}
+			
+			setStoredPhone(phone);
+			const fphone = getStoredPhone();
+
+			if (!validatePhone(fphone)) {
+				throw new Error("Invalid phone format after normalization");
+			}
 
 			await apiRequest("/send-otp", "POST", { phone: fphone });
 
-			router.push(`/verify?phone=${encodeURIComponent(phone)}`);
+			console.log(`[Phone Transition] Login -> Verify: ${fphone}`);
+			router.push("/verify");
 		} catch (e) {
 			alert(`Failed to check phone: ${e?.message ?? e}`);
 		} finally {
@@ -48,13 +64,33 @@ export default function LoginPage() {
 			alert("Please accept Terms of Condition");
 			return;
 		}
+		if (!/^\d{10}$/.test(phone)) {
+			alert("Please enter a valid 10-digit mobile number");
+			return;
+		}
+
 		try {
 			setLoading(true);
-			const fphone = `91${phone}`;
+
+			const currentStored = getStoredPhone();
+			const normalizedInput = `91${phone}`;
+
+			if (currentStored && currentStored !== normalizedInput) {
+				const legacyKeys = ["session_token", "userId", "kazilen_user_id", "kazilen_userId", "kazilen_user_id_v2"];
+				legacyKeys.forEach(key => SafeStorage.remove(key));
+			}
+			
+			setStoredPhone(phone);
+			const fphone = getStoredPhone();
+
+			if (!validatePhone(fphone)) {
+				throw new Error("Invalid phone format after normalization");
+			}
+
 			await apiRequest("/customer/send-otp", "POST", { phone: fphone });
-			router.push(
-				`/verify?phone=${encodeURIComponent(phone)}`,
-			);
+			
+			console.log(`[Phone Transition] CreateAccount -> Verify: ${fphone}`);
+			router.push("/verify");
 		} catch (e) {
 			alert(`Failed to check phone: ${e?.message ?? e}`);
 		} finally {

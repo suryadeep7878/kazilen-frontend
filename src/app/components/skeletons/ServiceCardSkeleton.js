@@ -1,20 +1,36 @@
+import Skeleton from "../ui/Skeleton";
+
 export default function ServiceCardSkeleton() {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden animate-pulse">
-      {/* Image Placeholder */}
-      <div className="w-full h-40 bg-gray-200"></div>
-      
-      {/* Content Placeholder */}
-      <div className="p-4 space-y-3">
-        {/* Title */}
-        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-        {/* Subtitle/Skill */}
-        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-        
-        {/* Price & Action */}
-        <div className="flex justify-between items-center pt-2">
-          <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-          <div className="h-8 bg-gray-200 rounded-lg w-20"></div>
+    <div className="w-full relative">
+      <div className="flex items-start gap-4 border rounded-2xl p-4 shadow-sm bg-white mb-3">
+        {/* Image Skeleton */}
+        <Skeleton className="w-[90px] h-[90px] sm:w-[150px] sm:h-[150px] rounded-xl flex-shrink-0" />
+
+        <div className="flex flex-col flex-1 justify-between self-stretch">
+          {/* Header Skeleton */}
+          <div className="flex justify-between items-start">
+            <div className="space-y-2 flex-1">
+              <Skeleton className="h-5 w-3/4 rounded" />
+              <Skeleton className="h-4 w-1/2 rounded" />
+            </div>
+            <Skeleton className="w-12 h-6 rounded-md ml-2" />
+          </div>
+
+          {/* Description Skeleton */}
+          <div className="mt-2 space-y-1.5 opacity-60">
+            <Skeleton className="h-3.5 w-full rounded" />
+            <Skeleton className="h-3.5 w-5/6 rounded" />
+          </div>
+
+          {/* Actions Skeleton */}
+          <div className="flex justify-between items-end mt-4 gap-2">
+            <Skeleton className="w-24 h-8 rounded-lg" />
+            <div className="flex flex-col items-end space-y-2">
+              <Skeleton className="w-16 h-4 rounded" />
+              <Skeleton className="w-24 h-8 rounded-lg" />
+            </div>
+          </div>
         </div>
       </div>
     </div>

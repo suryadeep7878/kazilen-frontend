@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import BackHeader from '../components/BackHeader' // keep this relative path if this file exists
 import { getUser, checkPhone, updateUser } from '@/app/lib/api'
+import SafeStorage from '@/utils/storage'
 
 export default function UserProfilePage() {
   const router = useRouter()
@@ -25,7 +26,7 @@ export default function UserProfilePage() {
         setLoading(true)
 
         // try saved id first
-        const savedId = localStorage.getItem('kazilen_user_id')
+        const savedId = SafeStorage.get('kazilen_user_id')
         if (savedId) {
           setUserId(savedId)
           await fetchAndPopulate(savedId)
@@ -33,11 +34,11 @@ export default function UserProfilePage() {
         }
 
         // fallback: try phone saved in localStorage
-        const savedPhone = localStorage.getItem('kazilen_user_phone')
+        const savedPhone = SafeStorage.get('kazilen_user_phone')
         if (savedPhone && savedPhone.match(/^\d{10}$/)) {
           const res = await checkPhone(savedPhone)
           if (res?.exists && res?.userId) {
-            localStorage.setItem('kazilen_user_id', String(res.userId))
+            SafeStorage.set('kazilen_user_id', String(res.userId))
             setUserId(String(res.userId))
             await fetchAndPopulate(res.userId)
             return
@@ -103,7 +104,7 @@ export default function UserProfilePage() {
       }
 
       const updated = await updateUser(userId, payload)
-      if (payload.phone) localStorage.setItem('kazilen_user_phone', payload.phone)
+      if (payload.phone) SafeStorage.set('kazilen_user_phone', payload.phone)
       alert('Profile updated successfully.')
       if (updated) {
         setName(updated.name ?? name)

@@ -28,18 +28,25 @@ export default function ProfessionalCard({ professional , subCategory}) {
       router.push('/booking-status')
     },
     onError: (error) => {
-      console.error('Booking failed, storing for background sync:', error)
-      // Background Sync handles retry, we still show success UX
+      console.error('Booking failed:', error)
+      // Do NOT redirect on error. Keep user on card to see the failure.
       setShowConfirm(false)
-      router.push('/booking-status')
+      // Here we rely on the parent or a global toast to show the error
+      alert(`Booking failed: ${error.message || 'Please try again'}`)
     }
   })
+
+  const getPrice = () => {
+    const subCatPrice = professional?.sub_category?.[subCategory]?.price;
+    const basePrice = professional?.price;
+    return subCatPrice ?? basePrice ?? '250';
+  };
 
   const confirmBooking = () => {
     mutation.mutate({
       professionalId: professional.id || 'temp-id',
       professionalName: professional.name,
-      price: professional?.sub_category?.[subCategory]?.price ?? professional?.price ?? '250' 
+      price: getPrice()
     })
   }
 
@@ -96,7 +103,7 @@ export default function ProfessionalCard({ professional , subCategory}) {
 
             <div className="flex flex-col items-end">
               <p className="text-sm font-semibold text-pink-600">
-                ₹{professional?.sub_category?.[subCategory]?.price ?? professional?.price ?? '250'} / hour
+                ₹{getPrice()} / hour
               </p>
               <button
                 onClick={openConfirm}
@@ -120,7 +127,7 @@ export default function ProfessionalCard({ professional , subCategory}) {
             <p className="text-sm text-gray-600 mt-3 text-center">
               Book <span className="font-semibold">{professional.name}</span> for{' '}
               <span className="font-semibold text-pink-600">
-                ₹{professional?.sub_category?.[subCategory]?.price ?? professional?.price ?? '250'}hour
+                ₹{getPrice()} / hour
               </span>
               ?
             </p>
