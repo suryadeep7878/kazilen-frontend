@@ -1,24 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ArrowLeft, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import { useRouter} from "next/navigation";
 import { apiRequest } from "../../utils/api";
-import SafeStorage, { getStoredPhone, clearStoredPhone, validatePhone } from "../../utils/storage";
 
-/**
- * CreateAccountClient - Refactored for robust phone state management.
- * Fixes:
- * - Hydration race conditions in PWA (isInitializing state)
- * - Single source of truth for phone state
- * - Strict normalization (91 prefix) for backend contract
- * - Logging for production debugging
- */
-export default function CreateAccountClient() {
+export default function CreateAccountClient({ phoneFromQuery }) {
 	const router = useRouter();
-	const [phone, setPhone] = useState("");
-	const [isInitializing, setIsInitializing] = useState(true);
-
+	const [phoneNo, setPhone] = useState(phoneFromQuery)
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [dob, setDob] = useState("");
@@ -63,19 +52,21 @@ export default function CreateAccountClient() {
 			setLoading(true);
 
 			const genderMap = {
-				male: "M",
-				female: "F",
-				other: "O",
+				'male': "M",
+				'female': "F",
+				'other': "O",
 			};
+
+			console.log(`phone is ${phoneNo} and actual is ${phoneFromQuery}`)
 
 			const genderEnum = genderMap[gender.toLowerCase()] || "O";
 			
 			const payload = {
-				phoneNo: phone,
-				name: name.trim(),
-				email: email,
-				dob: dob,
-				gender: genderEnum,
+				'phoneNo': `+91${phoneNo}`,
+				'name': name.trim(),
+				'email': email,
+				'dob': dob,
+				'gender': genderEnum,
 			};
 
 			console.log("[CreateAccount] Dispatching payload to /create-account:", payload);
