@@ -230,7 +230,7 @@ export default function VerifyOtpClient() {
 
         <div className="flex justify-between items-center text-sm">
           <span className="text-gray-500">
-            Didn't receive code?{" "}
+            Does not receive code?{" "}
             <button
               disabled={!resendEnabled || resending}
               onClick={handleResend}

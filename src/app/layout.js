@@ -25,9 +25,9 @@ export default function RootLayout({ children }) {
             <ServiceWorkerRegister />
             <ConditionalHeader />
             <LocationLoader />
-            <AuthGuard>
+            {/* <AuthGuard> */}
               {children}
-            </AuthGuard>
+            {/* </AuthGuard> */}
             <ConditionalBottomNav />
           </Providers>
         </NuqsAdapter>
