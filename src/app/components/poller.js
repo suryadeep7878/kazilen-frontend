@@ -1,25 +1,41 @@
-'use client'
-import React, { useState, useEffect } from 'react';
+"use client";
 
-export default function PollData() {
-  const [data, setData] = useState(null);
+import { useEffect } from 'react';
+import { apiRequest } from '@/utils/api';
 
+export default function BackgroundPoller() {
   useEffect(() => {
-    const pollInterval = setInterval(async () => {
-      const userId = localStorage.getItem('userId');
-      
-      if (userId) {
-        try {
-          const result = await apiRequest('/poll', 'post', { id: userId });
-          setData(result);
-        } catch (error) {
-          console.error("Polling failed:", error);
-        }
-      }
-    }, 5000); 
+    if (typeof window === 'undefined') return;
 
-    return () => clearInterval(pollInterval); 
+    console.log("BackgroundPoller initialized successfully on the client.");
+
+    const runPoll = async () => {
+      try {
+        const userId = localStorage.getItem('userId');
+        
+        if (!userId) {
+          console.log("Polling skipped: No userId found in localStorage yet.");
+          return;
+        }
+
+        console.log(`Firing poll request for ID: ${userId}...`);
+        const data = await apiRequest('/poll', 'post', { userId: userId });
+        console.log('Background poll data received:', data);
+
+      } catch (error) {
+        console.error('Polling network/runtime error:', error);
+      }
+    };
+
+    runPoll();
+
+    const pollInterval = setInterval(runPoll, 5000);
+
+    return () => {
+      console.log("BackgroundPoller cleaned up.");
+      clearInterval(pollInterval);
+    };
   }, []);
 
-  return null; 
+  return null;
 }
