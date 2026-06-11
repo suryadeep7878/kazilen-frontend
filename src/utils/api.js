@@ -1,6 +1,6 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL
   ? `${process.env.NEXT_PUBLIC_API_URL}/customer`
-  : "http://127.0.0.1:8000/api/customer";
+  : "https://kazilen-prod-899213799870.asia-south1.run.app/api/customer";
 
 export const apiRequest = async (endpoint, method = "GET", body = null) => {
   const config = {
