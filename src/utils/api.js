@@ -1,31 +1,41 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL
-  ? `${process.env.NEXT_PUBLIC_API_URL}/customer`
-  : "https://kazilen-prod-899213799870.asia-south1.run.app/api/customer";
+import { getCookie} from "./customCookie";
 
-export const apiRequest = async (endpoint, method = "GET", body = null) => {
-  const config = {
-    method,
-    credentials: "include", // 🔥 REQUIRED for cookies
-    headers: {
-      "Content-Type": "application/json",
-    },
-    ...(body && { body: JSON.stringify(body) }),
-  };
+const BASE_URL =
+	"https://kazilen-prod-899213799870.asia-south1.run.app/api/helper";
 
-  try {
-    const response = await fetch(`${BASE_URL}${endpoint}`, config);
 
-    // 🔥 If session expired → redirect
-    if (response.status === 401) {
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(new Event("unauthorized"));
-      }
-      throw new Error("UNAUTHORIZED");
-    }
+export const apiRequest = async (endpoint, method = "Get", body = null) => {
+	const headers = {
+		"Content-Type": "application/json",
+	};
 
-    return await response.json();
-  } catch (error) {
-    console.error("API Request Failed:", error);
-    return { error: "Network error occurred" };
-  }
+	let token = null;
+	if (typeof window !== "undefined") {
+		token = getCookie("session_token");
+		if (token) {
+			headers["Authorization"] = `Bearer ${token}`;
+		}
+	}
+
+	const config = {
+		method,
+		headers,
+		...(body && { body: JSON.stringify(body) }),
+	};
+
+	try {
+		const response = await fetch(`${BASE_URL}${endpoint}`, config);
+
+		if (response.status === 401) {
+			if (typeof window !== "undefined")
+				localStorage.removeItem("session_token");
+			window.location.href = "/login";
+			return null;
+		}
+
+		return await response.json();
+	} catch (error) {
+		console.error("API Request Failed:", error);
+		return { error: "Network error occurred" };
+	}
 };
