@@ -7,13 +7,14 @@ import { useRouter } from 'next/navigation'
 import { useMutation } from '@tanstack/react-query'
 import { bookService } from '../../lib/api'
 import { apiRequest } from '@/utils/api'
+import { getCookie } from '@/utils/customCookie'
 
 export default function ProfessionalCard({ professional, subCategory }) {
 	const [showConfirm, setShowConfirm] = useState(false)
 	const [showProfile, setShowProfile] = useState(false)
 	const router = useRouter()
 	const cardRef = useRef(null)
-	const userId = localStorage.getItem('userId')
+	const userId = getCookie('userId')
 
 	const openConfirm = () => {
 		setShowConfirm(true)
@@ -31,7 +32,6 @@ export default function ProfessionalCard({ professional, subCategory }) {
 		},
 		onError: (error) => {
 			console.error('Booking failed, storing for background sync:', error)
-			// Background Sync handles retry, we still show success UX
 			setShowConfirm(false)
 			router.push('/booking-status')
 		}

@@ -1,41 +1,42 @@
-'use client';
-import { startPolling } from "@/utils/poll";
-import { useEffect } from "react";
-import { apiRequest } from "@/utils/api";
+"use client";
+
+import { useEffect } from 'react';
+import { apiRequest } from '@/utils/api';
+import { getCookie } from '@/utils/customCookie';
 
 export default function BackgroundPoller() {
   useEffect(() => {
-    let stopPolling = null;
+    if (typeof window === 'undefined') return;
 
-    const syncPollingState = () => {
-      const isOnline = localStorage.getItem('online') === 'true';
-			const userID = localStorage.getItem('userId')
-      if (isOnline && !stopPolling) {
-        console.log("Polling started...");
-        stopPolling = startPolling(async () => {
-          await apiRequest('/poll-this', 'post', {"id": userID}) 
-        }, 10000);
-      } 
-      else if (!isOnline && stopPolling) {
-        console.log("Polling stopped.");
-        stopPolling();
-        stopPolling = null;
+    console.log("BackgroundPoller initialized successfully on the client.");
+
+    const runPoll = async () => {
+      try {
+        const userId = getCookie('userId');
+        
+        if (!userId) {
+          console.log("Polling skipped: No userId found in localStorage yet.");
+          return;
+        }
+
+        console.log(`Firing poll request for ID: ${userId}...`);
+        const data = await apiRequest('/poll', 'post', { userId: userId });
+        console.log('Background poll data received:', data);
+
+      } catch (error) {
+        console.error('Polling network/runtime error:', error);
       }
     };
 
-    syncPollingState();
+    runPoll();
 
-    window.addEventListener('storage', syncPollingState);
-
-    const interval = setInterval(syncPollingState, 2000);
+    const pollInterval = setInterval(runPoll, 5000);
 
     return () => {
-      if (stopPolling) stopPolling();
-      window.removeEventListener('storage', syncPollingState);
-      clearInterval(interval);
+      console.log("BackgroundPoller cleaned up.");
+      clearInterval(pollInterval);
     };
   }, []);
 
   return null;
 }
-
