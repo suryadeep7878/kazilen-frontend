@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
 						<ServiceWorkerRegister />
 						<ConditionalHeader />
 						<LocationLoader />
-						<BackgroundPoller />{children}
+						{children}
 						<ConditionalBottomNav />
 					</Providers>
 				</NuqsAdapter>
