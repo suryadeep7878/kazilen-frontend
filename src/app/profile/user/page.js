@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import BackHeader from '../components/BackHeader' // keep this relative path if this file exists
 import { getUser, checkPhone, updateUser } from '@/app/lib/api'
+import { getCookie } from '@/utils/customCookie'
 
 export default function UserProfilePage() {
   const router = useRouter()
@@ -25,7 +26,7 @@ export default function UserProfilePage() {
         setLoading(true)
 
         // try saved id first
-        const savedId = localStorage.getItem('kazilen_user_id')
+        const savedId = getCookie("userId") 
         if (savedId) {
           setUserId(savedId)
           await fetchAndPopulate(savedId)
