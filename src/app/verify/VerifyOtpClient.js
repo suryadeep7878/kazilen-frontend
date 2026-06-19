@@ -55,7 +55,7 @@ export default function VerifyOtpClient() {
 			});
 			if (response?.success) {
 				const result = await apiRequest("/check", "POST", { phone });
-				setCookie("session_token", response.session_token);
+				setCookie("session_token", response.session);
 				if (result?.exists) {
 					setCookie("userId", result.id);
 					router.push("/");

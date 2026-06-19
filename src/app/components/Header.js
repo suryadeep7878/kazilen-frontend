@@ -27,13 +27,19 @@ export default function Header() {
         >
           <div className="flex items-center text-sm font-medium text-gray-700">
             <MapPin size={16} className="text-red-500 mr-1" />
-            Hotel
+            Address
             <ChevronDown size={14} className="ml-1 text-gray-600" />
           </div>
-          <p className="text-xs text-gray-400 leading-tight">
-            308, 3 Floor, Hotel Sunshine INN, Sadar, Nagpur
-          </p>
+
         </button>
+
+        {/* Center - City Availability */}
+        <div className="justify-self-center">
+          <span className="text-sm font-semibold text-orange-600 whitespace-nowrap">
+            Available in Nagpur
+          </span>
+        </div>
+
 
         {/* Profile Button */}
         <button
@@ -42,7 +48,7 @@ export default function Header() {
           title="Open profile"
           aria-label="Open profile"
         >
-          U
+          P
         </button>
       </div>
 
