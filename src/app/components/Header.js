@@ -3,17 +3,19 @@
 
 import { MapPin, ChevronDown } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/context/AuthContext'
 // import SearchBar from './SearchBar'
 
 export default function Header() {
   const router = useRouter()
+  const { withAuth } = useAuth()
 
   const openAddress = () => {
-    router.push('/select-address')
+    withAuth(() => router.push('/select-address'))
   }
 
   const openProfile = () => {
-    router.push('/profile')
+    withAuth(() => router.push('/profile'))
   }
 
   return (
