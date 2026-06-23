@@ -1,4 +1,5 @@
 import "./globals.css";
+import Script from "next/script";
 import ConditionalHeader from "./components/ConditionalHeader";
 import ConditionalBottomNav from "./components/ConditionalBottomNav";
 import ServiceWorkerRegister from "./ServiceWorkerRegister";
@@ -29,12 +30,25 @@ export default function RootLayout({ children }) {
 							<LocationLoader />
 							{children}
 							<ConditionalBottomNav />
-							{/* Global auth modal — rendered at root so it overlays everything */}
 							<AuthModal />
 						</AuthProvider>
 					</Providers>
 				</NuqsAdapter>
 			</body>
+
+			<Script
+				src="https://www.googletagmanager.com/gtag/js?id=G-4VR1GJM30T"
+				strategy="afterInteractive"
+			/>
+
+			<Script id="google-analytics" strategy="afterInteractive">
+				{`
+					window.dataLayer = window.dataLayer || [];
+					function gtag(){dataLayer.push(arguments);}
+					gtag('js', new Date());
+					gtag('config', 'G-4VR1GJM30T');
+				`}
+			</Script>
 		</html>
 	);
 }
